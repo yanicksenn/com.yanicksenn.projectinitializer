@@ -12,6 +12,7 @@ namespace YanickSenn.ProjectInitializer.Editor
         private int _selectedPackageIndex;
         private string _selectedPackagePath;
         private string _version;
+        private string _originalVersion;
 
         public static void ShowWindow() {
             GetWindow<PackageVersioningWindow>("Bump Package Version");
@@ -52,6 +53,7 @@ namespace YanickSenn.ProjectInitializer.Editor
                 BumpVersion(VersionComponent.Patch);
             }
 
+            GUI.enabled = _version != _originalVersion;
             if (GUILayout.Button("Release")) {
                 if (EditorUtility.DisplayDialog("Confirm Release", 
                     $"Are you sure you want to release version {_version} for package {_packages[_selectedPackageIndex]}?", 
@@ -61,12 +63,14 @@ namespace YanickSenn.ProjectInitializer.Editor
                     Release();
                 }
             }
+            GUI.enabled = true;
         }
 
         private void SelectPackage(int index) {
             _selectedPackageIndex = index;
             _selectedPackagePath = Path.GetFullPath("Packages/" + _packages[index]);
             _version = GetPackageVersion();
+            _originalVersion = _version;
         }
 
         private string GetPackageVersion() {
