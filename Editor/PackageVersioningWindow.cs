@@ -128,10 +128,13 @@ namespace YanickSenn.ProjectInitializer.Editor
                 RunGitCommand($"commit -m \"chore(release): {_version}\"", _selectedPackagePath);
 
                 EditorUtility.DisplayProgressBar("Releasing Package", "Tagging release...", 0.75f);
-                RunGitCommand($"tag {_version}", _selectedPackagePath);
+                RunGitCommand($"tag -a {_version} -m \"chore(release): {_version}\"", _selectedPackagePath);
 
-                EditorUtility.DisplayProgressBar("Releasing Package", "Pushing to remote...", 1.0f);
-                RunGitCommand("push origin --follow-tags", _selectedPackagePath);
+                EditorUtility.DisplayProgressBar("Releasing Package", "Pushing code to remote...", 1.0f);
+                RunGitCommand("push origin main", _selectedPackagePath);
+                
+                EditorUtility.DisplayProgressBar("Releasing Package", "Pushing tags to remote...", 1.0f);
+                RunGitCommand($"push origin \"{_version}\"", _selectedPackagePath);
             }
             finally {
                 EditorUtility.ClearProgressBar();
