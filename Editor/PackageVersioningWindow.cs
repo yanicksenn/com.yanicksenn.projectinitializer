@@ -131,7 +131,7 @@ namespace YanickSenn.ProjectInitializer.Editor
                 RunGitCommand($"tag {_version}", _selectedPackagePath);
 
                 EditorUtility.DisplayProgressBar("Releasing Package", "Pushing to remote...", 1.0f);
-                RunGitCommand("push --follow-tags", _selectedPackagePath);
+                RunGitCommand("push origin --tags", _selectedPackagePath);
             }
             finally {
                 EditorUtility.ClearProgressBar();
