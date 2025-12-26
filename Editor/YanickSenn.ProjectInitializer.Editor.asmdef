@@ -1,7 +1,9 @@
 {
     "name": "YanickSenn.ProjectInitializer.Editor",
     "rootNamespace": "YanickSenn.ProjectInitializer.Editor",
-    "references": [],
+    "references": [
+        "YanickSenn.Utils"
+    ],
     "includePlatforms": [
         "Editor"
     ],

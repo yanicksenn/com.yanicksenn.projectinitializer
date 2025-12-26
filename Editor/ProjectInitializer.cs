@@ -15,6 +15,7 @@ namespace YanickSenn.ProjectInitializer.Editor
             { "Assets/Art", typeof(ArtAnchor) },
             { "Assets/Audio", typeof(AudioAnchor) },
             { "Assets/Features", typeof(FeaturesAnchor) },
+            { "Assets/GlobalEvents", typeof(GlobalEventsAnchor) },
             { "Assets/Materials", typeof(MaterialsAnchor) },
             { "Assets/Models", typeof(ModelsAnchor) },
             { "Assets/Prefabs", typeof(PrefabsAnchor) },
@@ -31,13 +32,18 @@ namespace YanickSenn.ProjectInitializer.Editor
             CopyResources();
             AddAndResolvePackages();
         }
+        
+        [MenuItem("Tools/Project Setup/Create missing folders only", priority = 1)]
+        public static void CreateMissingFoldersOnly() {
+            CreateFolders();
+        }
 
-        [MenuItem("Tools/Project Setup/Create Embedded Unity Package", priority = 1)]
+        [MenuItem("Tools/Project Setup/Create Embedded Unity Package", priority = 2)]
         public static void ShowPackageCreatorWindow() {
             PackageCreatorWindow.ShowWindow();
         }
         
-        [MenuItem("Tools/Project Setup/Auto-fix Violations", priority = 2)]
+        [MenuItem("Tools/Project Setup/Auto-fix Violations", priority = 3)]
         public static void AutoFixViolations() {
             var violationsFound = false;
             var anchorGuids = AssetDatabase.FindAssets($"t:{typeof(AbstractAnchor)}");
