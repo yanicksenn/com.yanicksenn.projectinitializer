@@ -1,30 +1,29 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEngine;
-using YanickSenn.ProjectInitializer.Editor.Anchors;
+using YanickSenn.Utils;
 
 namespace YanickSenn.ProjectInitializer.Editor
 {
     public static class ProjectInitializer {
         
-        private static readonly Dictionary<string, Type> Folders = new() {
-            { "Assets/Art", typeof(ArtAnchor) },
-            { "Assets/Audio", typeof(AudioAnchor) },
-            { "Assets/Features", typeof(FeaturesAnchor) },
-            { "Assets/GlobalEvents", typeof(GlobalEventsAnchor) },
-            { "Assets/Materials", typeof(MaterialsAnchor) },
-            { "Assets/Models", typeof(ModelsAnchor) },
-            { "Assets/Prefabs", typeof(PrefabsAnchor) },
-            { "Assets/Scenes", typeof(ScenesAnchor) },
-            { "Assets/Scripts", typeof(ScriptsAnchor) },
-            { "Assets/Settings", typeof(SettingsAnchor) },
-            { "Assets/Shaders", typeof(ShadersAnchor) },
-            { "Assets/Textures", typeof(TexturesAnchor) },
-            { "Assets/Variables/Ints", typeof(IntVariableAnchor) },
+        private static readonly Dictionary<string, AnchorConfig> Folders = new() {
+            { "Assets/Art", new AnchorConfig() { fileNamePrefix = "art" } },
+            { "Assets/Audio", new AnchorConfig() { fileNamePrefix = "audio" } },
+            { "Assets/Features", new AnchorConfig() { fileNamePrefix = "feature", classType = typeof(FeatureFlag)  } },
+            { "Assets/Events", new AnchorConfig() { fileNamePrefix = "event", classType = typeof(GlobalEvent)  } },
+            { "Assets/Materials", new AnchorConfig() { fileNamePrefix = "material", classType = typeof(Material)  } },
+            { "Assets/Models", new AnchorConfig() { } },
+            { "Assets/Prefabs", new AnchorConfig() { fileNamePrefix = "prefab", classType = typeof(GameObject)  } },
+            { "Assets/Scenes", new AnchorConfig() { fileNamePrefix = "scene", classType = typeof(SceneAsset)  } },
+            { "Assets/Scripts", new AnchorConfig() { disableAutoFixing = true } },
+            { "Assets/Settings", new AnchorConfig() { } },
+            { "Assets/Shaders", new AnchorConfig() { fileNamePrefix = "shader", classType = typeof(Shader)  } },
+            { "Assets/Textures", new AnchorConfig() { fileNamePrefix = "texture" } },
+            { "Assets/Variables/Ints", new AnchorConfig() { fileNamePrefix = "int", classType = typeof(IntVariable) } },
         };
         
         [MenuItem("Tools/Project Setup/Initialize Project", priority = 0)]
@@ -47,10 +46,13 @@ namespace YanickSenn.ProjectInitializer.Editor
         [MenuItem("Tools/Project Setup/Auto-fix Violations", priority = 3)]
         public static void AutoFixViolations() {
             var violationsFound = false;
-            var anchorGuids = AssetDatabase.FindAssets($"t:{typeof(AbstractAnchor)}");
+            var anchorGuids = AssetDatabase.FindAssets($"t:{typeof(Anchor)}");
             foreach (var anchorGuid in anchorGuids) {
                 var anchorPath = AssetDatabase.GUIDToAssetPath(anchorGuid);
-                var anchor = AssetDatabase.LoadAssetAtPath<AbstractAnchor>(anchorPath);
+                var anchor = AssetDatabase.LoadAssetAtPath<Anchor>(anchorPath);
+                if (anchor.DisableAutoFixing) {
+                    continue;
+                }
                 var assetTypes = anchor.GetAssetTypes();
                 var anchorDirectory = anchor.GetParentDirectory();
 
@@ -126,7 +128,7 @@ namespace YanickSenn.ProjectInitializer.Editor
         private static void CreateFolders() {
             foreach (var folderEntry in Folders) {
                 var folderPath = folderEntry.Key;
-                var anchorType = folderEntry.Value;
+                var anchorConfig = folderEntry.Value;
 
                 FileUtils.CreateDirectoryIfNeeded(folderPath);
 
@@ -135,7 +137,10 @@ namespace YanickSenn.ProjectInitializer.Editor
 
                 if (AssetDatabase.LoadAssetAtPath<ScriptableObject>(anchorPath) != null) continue;
 
-                var anchor = ScriptableObject.CreateInstance(anchorType);
+                var anchor = ScriptableObject.CreateInstance<Anchor>();
+                anchor.DisableAutoFixing = anchorConfig.disableAutoFixing;
+                anchor.FileNamePrefix = anchorConfig.fileNamePrefix;
+                anchor.ClassType = anchorConfig.classType;
                 AssetDatabase.CreateAsset(anchor, anchorPath);
                 Debug.Log("Created anchor: " + anchorPath);
             }

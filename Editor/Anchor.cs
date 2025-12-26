@@ -4,27 +4,44 @@ using System.IO;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
+using YanickSenn.Utils;
 
-namespace YanickSenn.ProjectInitializer.Editor.Anchors {
-    public abstract class AbstractAnchor : ScriptableObject {
-        public abstract HashSet<Type> GetAssetTypes();
+namespace YanickSenn.ProjectInitializer.Editor {
+    [CreateAssetMenu(fileName = "Anchor", menuName = "Anchor")]
+    public class Anchor : ScriptableObject {
+        [SerializeField] private bool disableAutoFixing;
+        [SerializeField] private string fileNamePrefix;
+        
+        [SerializeField]
+        [ClassTypeConstraint(baseType: typeof(UnityEngine.Object))]
+        private ClassTypeReference classType = new();
 
-        public virtual IFileNamingStrategy GetFileNamingStrategy() {
-            return new None();
+        public bool DisableAutoFixing {
+            get => disableAutoFixing;
+            set => disableAutoFixing = value;
+        }
+        public string FileNamePrefix {
+            get => fileNamePrefix;
+            set => fileNamePrefix = value;
+        }
+        public Type ClassType {
+            get => classType.Type;
+            set => classType.Type = value;
+        }
+
+        public HashSet<Type> GetAssetTypes() {
+            return new HashSet<Type> {
+                classType.Type
+            };
+        }
+
+        public IFileNamingStrategy GetFileNamingStrategy() {
+            return new SnakeCaseWithPrefix(fileNamePrefix);
         }
         
         public string GetParentDirectory() {
             var assetPath = AssetDatabase.GetAssetPath(this);
             return Path.GetDirectoryName(assetPath);
-        }
-        
-        
-    }
-
-    public class None : IFileNamingStrategy {
-        public bool Rename(string assetPath) {
-            // Do nothing.
-            return false;
         }
     }
 
