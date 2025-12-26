@@ -24,6 +24,7 @@ namespace YanickSenn.ProjectInitializer.Editor
             { "Assets/Settings", typeof(SettingsAnchor) },
             { "Assets/Shaders", typeof(ShadersAnchor) },
             { "Assets/Textures", typeof(TexturesAnchor) },
+            { "Assets/Variables/Ints", typeof(IntVariableAnchor) },
         };
         
         [MenuItem("Tools/Project Setup/Initialize Project", priority = 0)]
@@ -136,6 +137,7 @@ namespace YanickSenn.ProjectInitializer.Editor
 
                 var anchor = ScriptableObject.CreateInstance(anchorType);
                 AssetDatabase.CreateAsset(anchor, anchorPath);
+                Debug.Log("Created anchor: " + anchorPath);
             }
 
             AssetDatabase.Refresh();
