@@ -4,11 +4,12 @@ using System.IO;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
-using YanickSenn.Utils;
+using YanickSenn.Utils.Control;
+using YanickSenn.Utils.RegistryGeneration;
 
 namespace YanickSenn.ProjectInitializer.Editor {
-    [CreateAssetMenu(fileName = "Anchor", menuName = "Anchor")]
-    public class Anchor : ScriptableObject {
+    [CreateAssetMenu(fileName = "FileAnchor", menuName = "File Anchor")]
+    public class FileAnchor : ScriptableObject {
         [SerializeField] private bool disableAutoFixing;
         [SerializeField] private string fileNamePrefix;
         

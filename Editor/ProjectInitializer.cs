@@ -5,6 +5,9 @@ using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEngine;
 using YanickSenn.Utils;
+using YanickSenn.Utils.Events;
+using YanickSenn.Utils.Features;
+using YanickSenn.Utils.Variables;
 
 namespace YanickSenn.ProjectInitializer.Editor
 {
@@ -46,10 +49,10 @@ namespace YanickSenn.ProjectInitializer.Editor
         [MenuItem("Tools/Project Setup/Auto-fix Violations", priority = 3)]
         public static void AutoFixViolations() {
             var violationsFound = false;
-            var anchorGuids = AssetDatabase.FindAssets($"t:{typeof(Anchor)}");
+            var anchorGuids = AssetDatabase.FindAssets($"t:{typeof(FileAnchor)}");
             foreach (var anchorGuid in anchorGuids) {
                 var anchorPath = AssetDatabase.GUIDToAssetPath(anchorGuid);
-                var anchor = AssetDatabase.LoadAssetAtPath<Anchor>(anchorPath);
+                var anchor = AssetDatabase.LoadAssetAtPath<FileAnchor>(anchorPath);
                 if (anchor.DisableAutoFixing) {
                     continue;
                 }
@@ -137,7 +140,7 @@ namespace YanickSenn.ProjectInitializer.Editor
 
                 if (AssetDatabase.LoadAssetAtPath<ScriptableObject>(anchorPath) != null) continue;
 
-                var anchor = ScriptableObject.CreateInstance<Anchor>();
+                var anchor = ScriptableObject.CreateInstance<FileAnchor>();
                 anchor.DisableAutoFixing = anchorConfig.disableAutoFixing;
                 anchor.FileNamePrefix = anchorConfig.fileNamePrefix;
                 anchor.ClassType = anchorConfig.classType;
