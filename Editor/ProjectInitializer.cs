@@ -27,6 +27,8 @@ namespace YanickSenn.ProjectInitializer.Editor
             { "Assets/Shaders", new AnchorConfig() { fileNamePrefix = "shader", classType = typeof(Shader)  } },
             { "Assets/Textures", new AnchorConfig() { fileNamePrefix = "texture" } },
             { "Assets/Variables/Ints", new AnchorConfig() { fileNamePrefix = "int", classType = typeof(IntVariable) } },
+            { "Assets/Variables/Floats", new AnchorConfig() { fileNamePrefix = "float", classType = typeof(FloatVariable) } },
+            { "Assets/Variables/Bools", new AnchorConfig() { fileNamePrefix = "bool", classType = typeof(BoolVariable) } },
         };
         
         [MenuItem("Tools/Project Setup/Initialize Project", priority = 0)]
