@@ -4,7 +4,6 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEngine;
-using YanickSenn.Utils;
 using YanickSenn.Utils.Events;
 using YanickSenn.Utils.Features;
 using YanickSenn.Utils.Variables;
@@ -34,6 +33,7 @@ namespace YanickSenn.ProjectInitializer.Editor
         [MenuItem("Tools/Project Setup/Initialize Project", priority = 0)]
         public static void InitializeProject() {
             CreateFolders();
+            ProjectConfiguration.GetOrCreateSettings();
             CopyResources();
             AddAndResolvePackages();
         }

@@ -10,16 +10,16 @@ using YanickSenn.ProjectInitializer.Editor.Shared;
 namespace YanickSenn.ProjectInitializer.Editor
 {
     public class PackageCreatorWindow : EditorWindow {
-        private string packageName = "com.company.packagename";
-        private string version = "1.0.0";
-        private string displayName = "Package Name";
-        private string description = "This is a description of the package.";
-        private string rootNamespace = "MyPackage";
-        private string unityVersion;
-        private string unityRelease;
-        private string authorName = "Company Name";
-        private string authorEmail = "support@company.com";
-        private string authorUrl = "https://www.company.com";
+        private string _packageName = "com.company.packagename";
+        private string _version = "1.0.0";
+        private string _displayName = "Package Name";
+        private string _description = "This is a description of the package.";
+        private string _rootNamespace = "MyPackage";
+        private string _unityVersion;
+        private string _unityRelease;
+        private string _authorName = "Company Name";
+        private string _authorEmail = "support@company.com";
+        private string _authorUrl = "https://www.company.com";
 
         public static void ShowWindow()
         {
@@ -31,12 +31,23 @@ namespace YanickSenn.ProjectInitializer.Editor
             var versionParts = fullVersion.Split('.');
             if (versionParts.Length >= 2)
             {
-                unityVersion = $"{versionParts[0]}.{versionParts[1]}";
+                _unityVersion = $"{versionParts[0]}.{versionParts[1]}";
             }
             if (versionParts.Length >= 3)
             {
-                unityRelease = versionParts[2];
+                _unityRelease = versionParts[2];
             }
+            LoadConfiguration();
+        }
+
+        private void LoadConfiguration() {
+            var config = ProjectConfiguration.GetOrCreateSettings();
+            if (config == null) return;
+            _authorName = config.defaultAuthorName;
+            _authorEmail = config.defaultAuthorEmail;
+            _authorUrl = config.defaultAuthorUrl;
+            _rootNamespace = config.defaultRootNamespace;
+            _packageName = config.defaultPackageName;
         }
 
         private void OnGUI()
@@ -58,7 +69,7 @@ namespace YanickSenn.ProjectInitializer.Editor
         private bool DrawForm()
         {
             GUILayout.Label("Package Information", EditorStyles.boldLabel);
-            packageName = EditorGUILayout.TextField("Package Name", packageName);
+            _packageName = EditorGUILayout.TextField("Package Name", _packageName);
         
             string packageRootPath = GetPackageRootPath();
             bool packageAlreadyExists = Directory.Exists(packageRootPath);
@@ -68,21 +79,21 @@ namespace YanickSenn.ProjectInitializer.Editor
             }
         
             GUI.enabled = !packageAlreadyExists;
-            version = EditorGUILayout.TextField("Version", version);
-            displayName = EditorGUILayout.TextField("Display Name", displayName);
-            description = EditorGUILayout.TextField("Description", description);
-            rootNamespace = EditorGUILayout.TextField("Root Namespace", rootNamespace);
+            _version = EditorGUILayout.TextField("Version", _version);
+            _displayName = EditorGUILayout.TextField("Display Name", _displayName);
+            _description = EditorGUILayout.TextField("Description", _description);
+            _rootNamespace = EditorGUILayout.TextField("Root Namespace", _rootNamespace);
             GUI.enabled = true;
 
             GUI.enabled = false;
-            EditorGUILayout.TextField("Unity Version", unityVersion);
-            EditorGUILayout.TextField("Unity Release", unityRelease);
+            EditorGUILayout.TextField("Unity Version", _unityVersion);
+            EditorGUILayout.TextField("Unity Release", _unityRelease);
             GUI.enabled = true;
 
             GUI.enabled = !packageAlreadyExists;
-            authorName = EditorGUILayout.TextField("Author Name", authorName);
-            authorEmail = EditorGUILayout.TextField("Author Email", authorEmail);
-            authorUrl = EditorGUILayout.TextField("Author URL", authorUrl);
+            _authorName = EditorGUILayout.TextField("Author Name", _authorName);
+            _authorEmail = EditorGUILayout.TextField("Author Email", _authorEmail);
+            _authorUrl = EditorGUILayout.TextField("Author URL", _authorUrl);
             GUI.enabled = true;
 
             List<string> validationErrors = ValidateInput();
@@ -99,32 +110,32 @@ namespace YanickSenn.ProjectInitializer.Editor
         {
             List<string> validationErrors = new List<string>();
 
-            if (!Regex.IsMatch(packageName, @"^com\.([a-z0-9_]+)\.([a-z0-9_]+)$"))
+            if (!Regex.IsMatch(_packageName, @"^com\.([a-z0-9_]+)\.([a-z0-9_]+)$"))
             {
                 validationErrors.Add("Package name must be in the format 'com.company.packagename'.");
             }
 
-            if (!Regex.IsMatch(version, @"^\d+\.\d+\.\d+$"))
+            if (!Regex.IsMatch(_version, @"^\d+\.\d+\.\d+$"))
             {
                 validationErrors.Add("Version must be in the format 'major.minor.patch'.");
             }
 
-            if (string.IsNullOrWhiteSpace(displayName))
+            if (string.IsNullOrWhiteSpace(_displayName))
             {
                 validationErrors.Add("Display name cannot be empty.");
             }
 
-            if (!Regex.IsMatch(rootNamespace, @"^[A-Z][a-zA-Z0-9]*(?:\.[A-Z][a-zA-Z0-9]*)*$"))
+            if (!Regex.IsMatch(_rootNamespace, @"^[A-Z][a-zA-Z0-9]*(?:\.[A-Z][a-zA-Z0-9]*)*$"))
             {
                 validationErrors.Add("Root Namespace must match the format 'CamelCase.CamelCase'.");
             }
 
-            if (string.IsNullOrWhiteSpace(authorName))
+            if (string.IsNullOrWhiteSpace(_authorName))
             {
                 validationErrors.Add("Author name cannot be empty.");
             }
 
-            if (string.IsNullOrWhiteSpace(authorEmail) || !Regex.IsMatch(authorEmail, @"^(.+)@(.+)$"))
+            if (string.IsNullOrWhiteSpace(_authorEmail) || !Regex.IsMatch(_authorEmail, @"^(.+)@(.+)$"))
             {
                 validationErrors.Add("Author email must be a valid email address.");
             }
@@ -138,16 +149,16 @@ namespace YanickSenn.ProjectInitializer.Editor
             // Create package.json
             string packageJsonPath = Path.Combine(packageRootPath, "package.json");
             var packageJson = new PackageJson {
-                name = packageName,
-                version = version,
-                displayName = displayName,
-                description = description,
-                unity = unityVersion,
-                unityRelease = unityRelease,
+                name = _packageName,
+                version = _version,
+                displayName = _displayName,
+                description = _description,
+                unity = _unityVersion,
+                unityRelease = _unityRelease,
                 author = new Author {
-                    name = authorName,
-                    email = authorEmail,
-                    url = authorUrl
+                    name = _authorName,
+                    email = _authorEmail,
+                    url = _authorUrl
                 }
             };
             
@@ -173,12 +184,12 @@ namespace YanickSenn.ProjectInitializer.Editor
             FileUtils.CreateDirectoryIfNeeded(editorTestsPath);
 
             // Create asmdef files
-            string asmdefName = rootNamespace;
-            CreateAsmdef(runtimePath, asmdefName, rootNamespace, AsmdefType.Runtime);
-            CreateAsmdef(editorPath, asmdefName + ".Editor", rootNamespace, AsmdefType.Editor, new[] { asmdefName });
-            CreateAsmdef(runtimeTestsPath, asmdefName + ".Tests", rootNamespace, AsmdefType.Tests,
+            string asmdefName = _rootNamespace;
+            CreateAsmdef(runtimePath, asmdefName, _rootNamespace, AsmdefType.Runtime);
+            CreateAsmdef(editorPath, asmdefName + ".Editor", _rootNamespace, AsmdefType.Editor, new[] { asmdefName });
+            CreateAsmdef(runtimeTestsPath, asmdefName + ".Tests", _rootNamespace, AsmdefType.Tests,
                 new[] { asmdefName, "UnityEngine.TestRunner", "UnityEditor.TestRunner" });
-            CreateAsmdef(editorTestsPath, asmdefName + ".Editor.Tests", rootNamespace, AsmdefType.EditorTests,
+            CreateAsmdef(editorTestsPath, asmdefName + ".Editor.Tests", _rootNamespace, AsmdefType.EditorTests,
                 new[] { asmdefName, asmdefName + ".Editor", "UnityEngine.TestRunner", "UnityEditor.TestRunner" });
 
             AssetDatabase.Refresh();
@@ -186,7 +197,7 @@ namespace YanickSenn.ProjectInitializer.Editor
         }
 
         private string GetPackageRootPath() {
-            return "Packages/" + packageName;
+            return "Packages/" + _packageName;
         }
 
         private enum AsmdefType
