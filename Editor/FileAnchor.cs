@@ -15,11 +15,6 @@ namespace YanickSenn.ProjectInitializer.Editor {
         [ClassTypeConstraint(baseType: typeof(UnityEngine.Object))]
         private ClassTypeReference classType = new();
         
-        [Header("Violations")]
-        [SerializeField] 
-        [UnityEngine.Serialization.FormerlySerializedAs("ignoreAllSubfolder")]
-        private bool contentDoesNotProduceViolations;
-
         public string FileNamePrefix {
             get => fileNamePrefix;
             set => fileNamePrefix = value;
@@ -27,10 +22,6 @@ namespace YanickSenn.ProjectInitializer.Editor {
         public Type ClassType {
             get => classType.Type;
             set => classType.Type = value;
-        }
-        public bool ContentDoesNotProduceViolations {
-            get => contentDoesNotProduceViolations;
-            set => contentDoesNotProduceViolations = value;
         }
 
         public HashSet<Type> GetAssetTypes() {
