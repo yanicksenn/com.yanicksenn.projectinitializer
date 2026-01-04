@@ -1,67 +1,92 @@
 # Project Initializer
 
-A Unity utility that helps initializing new Unity projects.
+A utility that helps initializing new unity projects.
 
 ## Installation
 1. Open "Package Manager"
 2. Choose "Add package from git URL..."
 3. Use the HTTPS URL of this repository:
 ```
-https://github.com/yanicksenn/Unity-PKG-ProjectInitializer.git#1.0.0
+4. Enter `https://github.com/yanicksenn/com.yanicksenn.projectinitializer.git`
 ```
 4. Click "Add"
 
 ## Features
 
-This package provides two main features:
+### Project Initialization
 
-1.  **Project Initialization:** A tool to set up a standardized folder structure and add a predefined set of useful packages to your project.
-2.  **Embedded Package Creator:** A tool to easily create new embedded Unity packages with the correct structure and files.
+The project initializer helps setting up a new project by creating a standard folder structure, installing common packages and copying resources.
+
+### Violation Scanner
+
+The violation scanner helps keeping the project clean by enforcing naming conventions and folder structures.
+
 
 ## How to Use
 
-### Project Initialization
+### Initialize Project
 
-To initialize your project, go to the Unity menu and select `Tools > Project Setup > Initialize Project`.
+1. Open the project initializer window via `Tools/Project Setup/Initialize Project`
+2. Select the folders to create
+3. Select the packages to install
+4. Select the resources to copy
+5. Click **Initialize Project**
 
-This will do the following:
+### Scan/Fix Violations
 
-*   **Create a standard folder structure:**
+1. Open the violation scanner window via `Tools/Project Setup/Violation Scanner`
+2. Click **Scan for Violations**
+3. Select the violations to fix
+4. Click **Fix Selected**
 
-    ```
-    Assets/
-    ├── _Project/
-    │   ├── Scenes/
-    │   └── Timeline/
-    ├── Art/
-    ├── Audio/
-    ├── Materials/
-    ├── Models/
-    ├── Prefabs/
-    ├── Scripts/
-    ├── Settings/
-    ├── Shaders/
-    └── Textures/
-    ```
+## Creating Custom Violations
 
-*   **Add and resolve the following packages:**
-    *   `com.unity.multiplayer.playmode`
-    *   `com.unity.multiplayer.tools`
-    *   `com.unity.netcode.gameobjects`
-    *   `com.unity.postprocessing`
-    *   `VContainer` (from a git URL)
+You can extend the violation scanner by creating custom detectors and handlers.
 
-### Embedded Package Creator
+### 1. Define the Violation
 
-To create a new embedded Unity package, go to the Unity menu and select `Tools > Project Setup > Create Embedded Unity Package`.
+Create a class that implements `IViolation` to hold the violation data.
 
-This will open a window where you can define the metadata for your new package, such as:
+```csharp
+public class MyCustomViolation : IViolation {
+    public string Title => "My Custom Violation";
+    public string SubTitle => "Asset Path";
+    public string Description => "This asset violates a custom rule.";
+    public bool IsSelected { get; set; }
+    
+    // Add custom data properties here
+    public string AssetPath { get; set; }
+}
+```
 
-*   Package Name (e.g., `com.mycompany.mypackage`)
-*   Version
-*   Display Name
-*   Description
-*   Root Namespace
-*   Author Information
+### 2. Create a Detector
 
-Once you click "Create", the tool will generate the complete folder structure and all necessary files for your new package inside the `Packages` folder.
+Implement `IViolationDetector` and add the `[ViolationDetector]` attribute.
+
+```csharp
+[ViolationDetector]
+public class MyCustomViolationDetector : IViolationDetector {
+    public IEnumerable<IViolation> Detect() {
+        // Logic to find violations
+        yield return new MyCustomViolation {
+            AssetPath = "Assets/SomeFile.txt"
+        };
+    }
+}
+```
+
+### 3. Create a Handler
+
+Implement `IViolationHandler` and add the `[ViolationHandler]` attribute targeting your violation type.
+
+```csharp
+[ViolationHandler(typeof(MyCustomViolation))]
+public class MyCustomViolationHandler : IViolationHandler {
+    public void Fix(IViolation violation) {
+        if (violation is MyCustomViolation myViolation) {
+            // Logic to fix the violation
+            Debug.Log($"Fixing {myViolation.AssetPath}");
+        }
+    }
+}
+```
