@@ -5,22 +5,21 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using YanickSenn.Utils.Control;
-using YanickSenn.Utils.RegistryGeneration;
 
 namespace YanickSenn.ProjectInitializer.Editor {
     [CreateAssetMenu(fileName = "FileAnchor", menuName = "File Anchor")]
     public class FileAnchor : ScriptableObject {
-        [SerializeField] private bool disableAutoFixing;
         [SerializeField] private string fileNamePrefix;
         
         [SerializeField]
         [ClassTypeConstraint(baseType: typeof(UnityEngine.Object))]
         private ClassTypeReference classType = new();
+        
+        [Header("Violations")]
+        [SerializeField] 
+        [UnityEngine.Serialization.FormerlySerializedAs("ignoreAllSubfolder")]
+        private bool contentDoesNotProduceViolations;
 
-        public bool DisableAutoFixing {
-            get => disableAutoFixing;
-            set => disableAutoFixing = value;
-        }
         public string FileNamePrefix {
             get => fileNamePrefix;
             set => fileNamePrefix = value;
@@ -28,6 +27,10 @@ namespace YanickSenn.ProjectInitializer.Editor {
         public Type ClassType {
             get => classType.Type;
             set => classType.Type = value;
+        }
+        public bool ContentDoesNotProduceViolations {
+            get => contentDoesNotProduceViolations;
+            set => contentDoesNotProduceViolations = value;
         }
 
         public HashSet<Type> GetAssetTypes() {
@@ -54,36 +57,43 @@ namespace YanickSenn.ProjectInitializer.Editor {
         }
 
         public bool Rename(string assetPath) {
+            if (TryGetCorrectFileName(assetPath, out var newFileName)) {
+                AssetDatabase.RenameAsset(assetPath, newFileName);
+                return true;
+            }
+            return false;
+        }
+
+        public bool TryGetCorrectFileName(string assetPath, out string newFileName) {
             var fileName = Path.GetFileNameWithoutExtension(assetPath);
             var extension = Path.GetExtension(assetPath);
-            var directory = Path.GetDirectoryName(assetPath);
+            var prefix = _filePrefix ?? "";
 
-            var violationFound = false;
+            var originalFileName = fileName;
             
-            if (!fileName.StartsWith(_filePrefix + "_")) {
-                violationFound = true;
-                fileName = _filePrefix + "_" + fileName;
+            if (!string.IsNullOrEmpty(prefix)) {
+                if (!fileName.StartsWith(prefix + "_")) {
+                    fileName = prefix + "_" + fileName;
+                }
             }
 
-            var newFileName = Regex.Replace(fileName, "(?<!^)(?<!_)([A-Z])", "_$1").ToLower();
-            if (fileName != newFileName) {
-                violationFound = true;
-                fileName = newFileName;
+            var snakeCaseName = Regex.Replace(fileName, "(?<!^)(?<!_)([A-Z])", "_$1").ToLower();
+            if (fileName != snakeCaseName) {
+                fileName = snakeCaseName;
             }
 
-            if (!violationFound) {
-                return false;
+            if (originalFileName != fileName) {
+                newFileName = fileName + extension;
+                return true;
             }
 
-            var newPath = directory != null 
-                ? Path.GetFileName(Path.Combine(directory, fileName + extension)) 
-                : fileName + extension;
-            AssetDatabase.RenameAsset(assetPath, newPath);
-            return true;
+            newFileName = null;
+            return false;
         }
     }
     
     public interface IFileNamingStrategy {
         bool Rename(string assetPath);
+        bool TryGetCorrectFileName(string assetPath, out string newFileName);
     }
 }
