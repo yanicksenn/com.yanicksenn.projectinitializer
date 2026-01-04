@@ -1,6 +1,6 @@
 {
   "name": "com.yanicksenn.projectinitializer",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "displayName": "Project Initializer",
   "description": "A utility that helps initializing new unity projects.",
   "unity": "6000.0",
@@ -11,6 +11,6 @@
     "url": ""
   },
   "dependencies": {
-    "com.yanicksenn.utils": "https://github.com/yanicksenn/com.yanicksenn.utils#1.0.4"
+    "com.yanicksenn.utils": "https://github.com/yanicksenn/com.yanicksenn.utils#2.0.1"
   }
 }
