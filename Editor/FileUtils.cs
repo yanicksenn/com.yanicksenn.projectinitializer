@@ -1,7 +1,6 @@
 using System.IO;
 
-namespace YanickSenn.ProjectInitializer.Editor
-{
+namespace YanickSenn.ProjectInitializer.Editor {
     public static class FileUtils {
         public static void CreateDirectoryIfNeeded(string path) {
             if (!Directory.Exists(path)) {

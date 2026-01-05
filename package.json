@@ -1,6 +1,6 @@
 {
   "name": "com.yanicksenn.projectinitializer",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "displayName": "Project Initializer",
   "description": "A utility that helps initializing new unity projects.",
   "unity": "6000.0",
