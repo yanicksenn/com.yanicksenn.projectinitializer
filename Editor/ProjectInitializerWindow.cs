@@ -30,7 +30,7 @@ namespace YanickSenn.ProjectInitializer.Editor
             { "Assets/Variables/Floats", new AnchorConfig() { fileNamePrefix = "float", classType = typeof(FloatVariable) } },
             { "Assets/Variables/Bools", new AnchorConfig() { fileNamePrefix = "bool", classType = typeof(BoolVariable) } },
         };
-        
+
         public static readonly List<string> Packages = new() {
             "com.unity.multiplayer.playmode",
             "com.unity.multiplayer.tools",
@@ -42,10 +42,9 @@ namespace YanickSenn.ProjectInitializer.Editor
             "https://github.com/yanicksenn/com.yanicksenn.tableview.git",
             "https://github.com/yanicksenn/com.yanicksenn.taskview.git",
             "https://github.com/yanicksenn/com.yanicksenn.utils.git",
-            "https://github.com/yanicksenn/com.yanicksenn.firstpersoncontroller.git",
             "https://github.com/yanicksenn/com.yanicksenn.selectionhistory.git",
         };
-        
+
         private readonly Dictionary<string, bool> _foldersToCreate = new();
         private readonly Dictionary<string, bool> _foldersDisabled = new();
         private readonly Dictionary<string, bool> _packagesToInstall = new();
@@ -74,7 +73,7 @@ namespace YanickSenn.ProjectInitializer.Editor
             var packagesPath = Path.Combine(projectRoot, "Packages");
             var manifestPath = Path.Combine(packagesPath, "manifest.json");
             var manifestContent = File.Exists(manifestPath) ? File.ReadAllText(manifestPath) : "";
-            
+
             var localPackageFolders = new List<string>();
             if (Directory.Exists(packagesPath))
             {
@@ -93,7 +92,7 @@ namespace YanickSenn.ProjectInitializer.Editor
                 var existsInManifest = manifestContent.Contains(package);
                 var packageNameFromUrl = GetPackageNameFromUrl(package);
                 var existsLocally = localPackageFolders.Contains(package) || (!string.IsNullOrEmpty(packageNameFromUrl) && localPackageFolders.Contains(packageNameFromUrl));
-                
+
                 var exists = existsInManifest || existsLocally;
                 _packagesDisabled[package] = exists;
                 _packagesToInstall[package] = !exists;
@@ -171,12 +170,12 @@ namespace YanickSenn.ProjectInitializer.Editor
             _createFoldersEnabled = EditorGUILayout.ToggleLeft("", _createFoldersEnabled, GUILayout.Width(20));
             _foldersFoldout = EditorGUILayout.Foldout(_foldersFoldout, "Folders to Create", true, EditorStyles.foldoutHeader);
             EditorGUILayout.EndHorizontal();
-            
+
             if (_foldersFoldout)
             {
                 EditorGUI.indentLevel++;
                 EditorGUI.BeginDisabledGroup(!_createFoldersEnabled);
-                
+
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("Select All")) SetAll(_foldersToCreate, _foldersDisabled, true);
                 if (GUILayout.Button("Deselect All")) SetAll(_foldersToCreate, _foldersDisabled, false);
@@ -275,7 +274,7 @@ namespace YanickSenn.ProjectInitializer.Editor
                 var selectedPackages = _packagesToInstall.Where(x => x.Value).Select(x => x.Key);
                 AddAndResolvePackages(selectedPackages);
             }
-            
+
             Debug.Log("Project initialization completed.");
             Close();
         }
@@ -314,7 +313,7 @@ namespace YanickSenn.ProjectInitializer.Editor
 
             AssetDatabase.Refresh();
         }
-        
+
         public static IEnumerable<string> GetAvailableResources() {
             var packagePath = Path.GetFullPath("Packages/com.yanicksenn.projectinitializer");
             var resourcesPath = Path.Combine(packagePath, "Resources");
@@ -356,7 +355,7 @@ namespace YanickSenn.ProjectInitializer.Editor
                 if (File.Exists(newFilePath)) {
                     continue;
                 }
-                
+
                 File.Copy(resourceFile, newFilePath);
                 Debug.Log($"Copied resource: {fileName}");
             }
